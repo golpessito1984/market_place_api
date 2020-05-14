@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 class Api::V1::UsersController < ApplicationController
   before_action :set_user, only: %i[show destroy update]
+  before_action :check_owner, only: [:update, :destroy]
 
   def show
     render json: @user, status: :ok
@@ -41,4 +42,11 @@ class Api::V1::UsersController < ApplicationController
     @user = User.find(params[:id])
   end
 
+  def check_owner
+    if @user.id == current_user&.id
+      true
+    else
+      render json: {errors: 'Forbidden action'}, status: :forbidden
+    end
+  end
 end

@@ -55,14 +55,31 @@ RSpec.describe Api::V1::UsersController do
   describe 'User DELETE #destroy' do
     before(:each) do
       @user = FactoryBot.create(:user)
+      @bearer_token = { Authorization:
+                            JwtWebToken.encode(user_id: @user.id) }
     end
 
-    it 'successfully destroy with valid user id' do
-      expect do
-        delete :destroy, params: {id: @user.id}
-      end.to change(User, :count).by(-1)
-      expect(response.status).to eq(204)
+    context 'with bearer token' do
+      it 'successfully destroy with valid user id' do
+        request.headers.merge!(@bearer_token)
+        expect do
+          delete :destroy, params: {id: @user.id}
+        end.to change(User, :count).by(-1)
+        expect(response.status).to eq(204)
+      end
     end
+
+    context 'with bearer token' do
+      it 'successfully destroy with valid user id' do
+        expect do
+          delete :destroy, params: {id: @user.id}
+        end.to change(User, :count).by(0)
+        expect(response.status).to eq(403)
+        hash_body = JSON.parse(response.body)
+        expect(hash_body["errors"]).to eq('Forbidden action')
+      end
+    end
+
   end
 
   describe 'User PUT #update' do
@@ -70,13 +87,27 @@ RSpec.describe Api::V1::UsersController do
       @user = FactoryBot.create(:user)
       @user_params = { email: 'raul.ruizdelarosa@gmail.com',
                        password: '111222' }
+      @bearer_token = { Authorization:
+          JwtWebToken.encode(user_id: @user.id) }
     end
 
-    it 'successfully update with valid params' do
-      put :update, params: {id: @user.id, user: @user_params}
-      expect(response.status).to eq(200)
-      hash_body = JSON.parse(response.body)
-      expect(hash_body["email"]).to eq(@user_params[:email])
+    context 'with not bearer token' do
+      it 'not successfully update to unauthorized user' do
+        put :update, params: {id: @user.id, user: @user_params}
+        expect(response.status).to eq(403)
+        hash_body = JSON.parse(response.body)
+        expect(hash_body["errors"]).to eq('Forbidden action')
+      end
+    end
+
+    context 'with correct bearer token' do
+      it 'successfully update' do
+        request.headers.merge!(@bearer_token)
+        put :update, params: {id: @user.id, user: @user_params}
+        expect(response.status).to eq(200)
+        hash_body = JSON.parse(response.body)
+        expect(hash_body["email"]).to eq( @user_params[:email])
+      end
     end
   end
 end
