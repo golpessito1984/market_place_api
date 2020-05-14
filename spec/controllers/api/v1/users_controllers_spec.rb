@@ -25,7 +25,7 @@ RSpec.describe Api::V1::UsersController do
   describe 'User POST #create' do
     before(:each) do
       @user_params = {user: {email: 'david.ruizdelarosa@gmail.com',
-                             password: '222333'}}
+                             password: '222333' }}
     end
 
     it 'return a successfully new user' do
@@ -62,6 +62,21 @@ RSpec.describe Api::V1::UsersController do
         delete :destroy, params: {id: @user.id}
       end.to change(User, :count).by(-1)
       expect(response.status).to eq(204)
+    end
+  end
+
+  describe 'User PUT #update' do
+    before(:each) do
+      @user = FactoryBot.create(:user)
+      @user_params = { email: 'raul.ruizdelarosa@gmail.com',
+                       password: '111222' }
+    end
+
+    it 'successfully update with valid params' do
+      put :update, params: {id: @user.id, user: @user_params}
+      expect(response.status).to eq(200)
+      hash_body = JSON.parse(response.body)
+      expect(hash_body["email"]).to eq(@user_params[:email])
     end
   end
 end
