@@ -50,6 +50,18 @@ RSpec.describe Api::V1::UsersController do
       hash_body = JSON.parse(response.body)
       expect(hash_body["email"]).to match_array(["is invalid"])
     end
+  end
 
+  describe 'User DELETE #destroy' do
+    before(:each) do
+      @user = FactoryBot.create(:user)
+    end
+
+    it 'successfully destroy with valid user id' do
+      expect do
+        delete :destroy, params: {id: @user.id}
+      end.to change(User, :count).by(-1)
+      expect(response.status).to eq(204)
+    end
   end
 end

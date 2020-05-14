@@ -1,5 +1,6 @@
+# frozen_string_literal: true
 class Api::V1::UsersController < ApplicationController
-  before_action :set_user, only: :show
+  before_action :set_user, only: %i[show destroy]
 
   def show
     render json: @user, status: :ok
@@ -11,6 +12,14 @@ class Api::V1::UsersController < ApplicationController
       render json: user, status: :created
     else
       render json: user.errors, status: :unprocessable_entity
+    end
+  end
+
+  def destroy
+    if @user.destroy
+      render json: {}, status: :no_content
+    else
+      render json: @user.errors, status: :unprocessable_entity
     end
   end
 
