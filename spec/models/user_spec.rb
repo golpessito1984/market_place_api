@@ -57,4 +57,16 @@ RSpec.describe User, type: :model do
     end
   end
 
+  context 'with several products' do
+    it 'when destroy user the related products are destroyed' do
+      user = FactoryBot.create(:user)
+      (1..5).each do |number|
+        new_product = FactoryBot.create(:product, user_id: user.id)
+      end
+      expect(user.products.count).to eq(5)
+      user.destroy
+      expect(Product.all.count).to eq(0)
+    end
+  end
+
 end
