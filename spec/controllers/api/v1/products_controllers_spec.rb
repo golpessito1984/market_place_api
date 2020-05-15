@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require 'rails_helper'
 
 RSpec.describe Api::V1::ProductsController do
@@ -16,8 +17,8 @@ RSpec.describe Api::V1::ProductsController do
     it 'successfully return all products' do
       get :index
       expect(response.status).to eq(200)
-      hash_body = JSON.parse(response.body)
-      expect(hash_body.count).to eq(3)
+      products = JSON.parse(response.body)['data']
+      expect(products.count).to eq(3)
     end
   end
 
@@ -30,10 +31,12 @@ RSpec.describe Api::V1::ProductsController do
     it 'successfully with valid product id' do
       get :show, params: {id: @product.id}
       expect(response.status).to eq(200)
-      hash_body = JSON.parse(response.body)
-      expect(hash_body["title"]).to eq(@product.title)
-      expect(hash_body["price"]).to eq("#{@product.price.round(2)}")
-      expect(hash_body["published"]).to eq(@product.published)
+      attributes = JSON.parse(response.body)['data']['attributes']
+      included = JSON.parse(response.body)['included']
+      expect(attributes['title']).to eq(@product.title)
+      expect(attributes['price']).to eq(@product.price.round(2).to_s)
+      expect(attributes['published']).to eq(@product.published)
+      expect(included[0]["attributes"]["email"]).to eq(@user.email)
     end
   end
 
@@ -54,15 +57,15 @@ RSpec.describe Api::V1::ProductsController do
       end.to change(Product, :count).by(1)
 
       expect(response.status).to eq(201)
-      hash_body = JSON.parse(response.body)
-      expect(hash_body["title"]).to eq('Soccer Ball')
+      attributes = JSON.parse(response.body)['data']['attributes']
+      expect(attributes['title']).to eq('Soccer Ball')
     end
 
     it 'cannot successfully without login' do
       post :create, params: @product_params
       expect(response.status).to eq(401)
       hash_body = JSON.parse(response.body)
-      expect(hash_body["errors"]).to eq('Unauthorized')
+      expect(hash_body['errors']).to eq('Unauthorized')
     end
   end
 
@@ -100,7 +103,7 @@ RSpec.describe Api::V1::ProductsController do
 
   end
 
-  describe "Product PUT #update" do
+  describe 'Product PUT #update' do
     before(:each) do
       @user2 = FactoryBot.create(:user)
       @product = FactoryBot.create(:product,
@@ -127,14 +130,13 @@ RSpec.describe Api::V1::ProductsController do
       expect(response.status).to eq(403)
     end
 
-    it 'successfulyy if user is the owner' do
+    it 'successfully if user is the owner' do
       request.headers.merge!(@bearer_token)
       put :update, params:{id: @product.id, product: @product_params}
       expect(response.status).to eq(200)
-      hash_body = JSON.parse(response.body)
-      expect(hash_body["title"]).to eq(@product_params[:title])
-      expect(hash_body["published"]).to eq(@product_params[:published])
+      attributes = JSON.parse(response.body)['data']['attributes']
+      expect(attributes['title']).to eq(@product_params[:title])
+      expect(attributes['published']).to eq(@product_params[:published])
     end
-
   end
 end

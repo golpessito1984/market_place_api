@@ -1,24 +1,28 @@
+# frozen_string_literal: true
 require 'rails_helper'
 
 RSpec.describe Api::V1::UsersController do
   describe 'User GET #show' do
     before(:each) do
       @user = FactoryBot.create(:user)
+      @product = FactoryBot.create(:product, user_id: @user.id)
+      @product2 = FactoryBot.create(:product, user_id: @user.id)
     end
 
     it 'return a successfully response with valid user id' do
       get :show, params: {id: @user.id}
       expect(response.status).to eq(200)
-      hash_body = JSON.parse(response.body)
-      expect(hash_body['email']).to eq(@user.email)
-      expect(hash_body['password']).to eq(@user.password)
+      attributes = JSON.parse(response.body)['data']['attributes']
+      included = JSON.parse(response.body)["included"]
+      expect(attributes['email']).to eq(@user.email)
+      expect(included.count).to eq(2)
     end
 
     it 'return a error message when resource not found' do
       get :show, params: {id: -1}
       expect(response.status).to eq(404)
       hash_body = JSON.parse(response.body)
-      expect(hash_body["errors"]).to eq('Record not found')
+      expect(hash_body['errors']).to eq('Record not found')
     end
   end
 
@@ -34,8 +38,8 @@ RSpec.describe Api::V1::UsersController do
       end.to change(User, :count).by(1)
 
       expect(response.status).to eq(201)
-      hash_body = JSON.parse(response.body)
-      expect(hash_body["email"]).to eq(@user_params[:user][:email])
+      attributes = JSON.parse(response.body)['data']['attributes']
+      expect(attributes['email']).to eq(@user_params[:user][:email])
     end
 
     it 'return a error message when params ara invalid' do
@@ -48,7 +52,7 @@ RSpec.describe Api::V1::UsersController do
 
       expect(response.status).to eq(422)
       hash_body = JSON.parse(response.body)
-      expect(hash_body["email"]).to match_array(["is invalid"])
+      expect(hash_body['email']).to match_array(['is invalid'])
     end
   end
 
@@ -76,7 +80,7 @@ RSpec.describe Api::V1::UsersController do
         end.to change(User, :count).by(0)
         expect(response.status).to eq(403)
         hash_body = JSON.parse(response.body)
-        expect(hash_body["errors"]).to eq('Forbidden action')
+        expect(hash_body['errors']).to eq('Forbidden action')
       end
     end
 
@@ -96,7 +100,7 @@ RSpec.describe Api::V1::UsersController do
         put :update, params: {id: @user.id, user: @user_params}
         expect(response.status).to eq(403)
         hash_body = JSON.parse(response.body)
-        expect(hash_body["errors"]).to eq('Forbidden action')
+        expect(hash_body['errors']).to eq('Forbidden action')
       end
     end
 
@@ -105,9 +109,19 @@ RSpec.describe Api::V1::UsersController do
         request.headers.merge!(@bearer_token)
         put :update, params: {id: @user.id, user: @user_params}
         expect(response.status).to eq(200)
-        hash_body = JSON.parse(response.body)
-        expect(hash_body["email"]).to eq( @user_params[:email])
+        attributes = JSON.parse(response.body)['data']['attributes']
+        expect(attributes['email']).to eq( @user_params[:email])
       end
+
+      it 'not successfully with invalid email' do
+        request.headers.merge!(@bearer_token)
+        @user_params[:email] = 'david.ruizdelarosa.gmail.com'
+        put :update, params: {id: @user.id, user: @user_params}
+        expect(response.status).to eq(422)
+        hash_body = JSON.parse(response.body)
+        expect(hash_body['email']).to match_array(['is invalid'])
+      end
+
     end
   end
 end
