@@ -35,8 +35,8 @@ RSpec.describe Order, type: :model do
       @seller = FactoryBot.create(:user)
       @buyer = FactoryBot.create(:user)
       @order = FactoryBot.create(:order, user_id: @buyer.id)
-      @product1 = FactoryBot.create(:product, user_id: @user.id)
-      @product2 = FactoryBot.create(:product, user_id: @user.id)
+      @product1 = FactoryBot.create(:product, user_id: @seller.id)
+      @product2 = FactoryBot.create(:product, user_id: @seller.id)
       placement = FactoryBot.create(:placement, product_id: @product1.id,
                                                 order_id: @order.id)
       placement2 = FactoryBot.create(:placement, product_id: @product2.id,
@@ -48,5 +48,4 @@ RSpec.describe Order, type: :model do
       expect(@order.products).to match_array([@product1, @product2])
     end
   end
-
 end
