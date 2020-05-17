@@ -9,7 +9,7 @@ class Api::V1::ProductsController < ApplicationController
   end
 
   def index
-    products = Product.all
+    products = Product.search(search_params)
     render json: ProductSerializer.new(products).serializable_hash, status: :ok
   end
 
@@ -61,4 +61,9 @@ class Api::V1::ProductsController < ApplicationController
   def product_params
     params.require(:product).permit(:title, :price, :published)
   end
+
+  def search_params
+    params[:search] ? params.require(:search).permit(:keyboard, :min_price, :max_price) : { }
+  end
+
 end

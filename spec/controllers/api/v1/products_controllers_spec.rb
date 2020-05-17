@@ -9,9 +9,20 @@ RSpec.describe Api::V1::ProductsController do
 
   describe 'Product GET #index' do
     before(:each) do
-      @product1 = FactoryBot.create(:product, user_id: @user.id)
-      @product2 = FactoryBot.create(:product, user_id: @user.id)
-      @product3 = FactoryBot.create(:product, user_id: @user.id)
+      @product1 = FactoryBot.create(:product, title: 'TV Plosmo Philopps',
+                                              price: 9999.99,
+                                              published: false,
+                                              user_id: @user.id)
+
+      @product2 = FactoryBot.create(:product, title: 'Azos Zeenbok',
+                                              price: 499.99,
+                                              published: false,
+                                              user_id: @user.id)
+
+      @product3 = FactoryBot.create(:product, title: 'Cheap TV',
+                                              price: 99.99,
+                                              published: false,
+                                              user_id: @user.id)
     end
 
     it 'successfully return all products' do
@@ -20,6 +31,18 @@ RSpec.describe Api::V1::ProductsController do
       products = JSON.parse(response.body)['data']
       expect(products.count).to eq(3)
     end
+
+    it 'successfully return one product with search params correctly' do
+      search_params = { search: { keyboard: 'tv',
+                                  min_price: 100,
+                                  max_price: 10000 }}
+
+      get :index, params: search_params
+      expect(response.status).to eq(200)
+      products = JSON.parse(response.body)['data']
+      expect(products.count).to eq(1)
+    end
+
   end
 
   describe 'Product GET #show' do

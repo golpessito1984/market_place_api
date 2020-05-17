@@ -12,9 +12,11 @@ RSpec.describe Api::V1::UsersController do
     it 'return a successfully response with valid user id' do
       get :show, params: {id: @user.id}
       expect(response.status).to eq(200)
-      attributes = JSON.parse(response.body)['data']['attributes']
-      included = JSON.parse(response.body)["included"]
-      expect(attributes['email']).to eq(@user.email)
+      attributes = JSON.parse(response.body, symbolize_names:
+          true)[:data][:attributes]
+      included = JSON.parse(response.body,symbolize_names:
+          true)[:included]
+      expect(attributes[:email]).to eq(@user.email)
       expect(included.count).to eq(2)
     end
 
