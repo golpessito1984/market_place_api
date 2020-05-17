@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require 'rails_helper'
 
 RSpec.describe Order, type: :model do
@@ -36,6 +37,13 @@ RSpec.describe Order, type: :model do
       @order.save
       expect(@order.products.count).to eq(2)
       expect(@order.products).to match_array([@product1, @product2])
+    end
+  end
+
+  context 'without enough stock' do
+    it 'can not create successfully' do
+      @order.placements << Placement.new(product_id: @product1.id, quantity: (1 + @product1.quantity))
+      expect(@order).to be_invalid
     end
   end
 

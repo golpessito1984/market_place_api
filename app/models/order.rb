@@ -1,10 +1,12 @@
 # frozen_string_literal: true
 class Order < ApplicationRecord
+  include ActiveModel::Validations
   belongs_to :user
   has_many :placements, dependent: :destroy
   has_many :products, through: :placements, source: 'product'
 
   validates :total, numericality: { greater_than_or_equal_to: 0 }, presence: true
+  validates_with EnoughProductsValidator
 
   before_validation :set_total!
 

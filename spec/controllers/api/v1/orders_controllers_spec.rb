@@ -74,7 +74,6 @@ RSpec.describe Api::V1::OrdersController do
       expect do
         post :create, params: @order_params
       end.to change(Order, :count).by(1)
-      binding.pry
       expect(response.status).to eq(201)
     end
 
