@@ -9,8 +9,10 @@ RSpec.describe Order, type: :model do
     @product1 = FactoryBot.create(:product, user_id: @seller.id)
     @product2 = FactoryBot.create(:product, user_id: @seller.id)
     @order = Order.new(user_id: @buyer.id)
-    @order.products << @product1
-    @order.products << @product2
+    # @order.products << @product1
+    # @order.products << @product2
+    @order.placements << Placement.new(product_id: @product1.id, quantity: 1)
+    @order.placements << Placement.new(product_id: @product2.id, quantity: 1)
   end
 
   context 'with valid total and user' do
