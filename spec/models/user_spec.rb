@@ -69,4 +69,23 @@ RSpec.describe User, type: :model do
     end
   end
 
+  context 'with a user order several products' do
+    before(:each) do
+      @user = FactoryBot.create(:user)
+
+      @order = FactoryBot.create(:order,
+                                 user_id: @user.id)
+
+      @order2 = FactoryBot.create(:order,
+                                  user_id: @user.id)
+    end
+
+    it 'when destroy user, will be destroy all orders' do
+      expect(@user.orders.count).to eq(2)
+      user_id = @user.id
+      @user.destroy
+      expect(Order.find_by_user_id(user_id)).to be_nil
+    end
+  end
+
 end
