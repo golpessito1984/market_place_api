@@ -4,5 +4,6 @@ FactoryBot.define do
     title { Faker::Beer.name }
     published { false }
     user_id { nil }
+    quantity { 5 }
   end
 end

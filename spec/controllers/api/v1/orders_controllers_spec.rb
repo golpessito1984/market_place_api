@@ -61,7 +61,10 @@ RSpec.describe Api::V1::OrdersController do
 
   describe 'Order POST #create' do
     before(:each) do
-      @order_params = { order: { product_id: [@product1.id, @product2.id]} }
+      @order_params = { order: { product_ids_and_quantities: [
+          { product_id: @product1.id, quantity: 2 },
+          { product_id: @product2.id, quantity: 3 },
+      ]}}
     end
 
     it 'successfully with products_id, user and total' do
@@ -71,6 +74,7 @@ RSpec.describe Api::V1::OrdersController do
       expect do
         post :create, params: @order_params
       end.to change(Order, :count).by(1)
+      binding.pry
       expect(response.status).to eq(201)
     end
 
