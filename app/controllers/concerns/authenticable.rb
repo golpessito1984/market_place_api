@@ -6,7 +6,6 @@ module Authenticable
     return nil if authorization_token.nil?
 
     payload_user = JwtWebToken.decode(authorization_token)
-    return User.find(payload_user[:user_id]) rescue
-                                               ActiveRecord::RecordNotFound
+    return User.find(payload_user[:user_id]) rescue ActiveRecord::RecordNotFound
   end
 end

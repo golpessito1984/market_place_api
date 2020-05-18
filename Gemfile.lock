@@ -1,6 +1,6 @@
 GIT
   remote: https://github.com/faker-ruby/faker.git
-  revision: 97937210e7d8f8b7cdd25a97a6e76c2900136b7f
+  revision: fc96fb1da66642828f824262fa002d5b496d6ce9
   branch: master
   specs:
     faker (2.11.0)
@@ -88,6 +88,18 @@ GEM
     i18n (1.8.2)
       concurrent-ruby (~> 1.0)
     jwt (2.2.1)
+    kaminari (1.2.0)
+      activesupport (>= 4.1.0)
+      kaminari-actionview (= 1.2.0)
+      kaminari-activerecord (= 1.2.0)
+      kaminari-core (= 1.2.0)
+    kaminari-actionview (1.2.0)
+      actionview
+      kaminari-core (= 1.2.0)
+    kaminari-activerecord (1.2.0)
+      activerecord
+      kaminari-core (= 1.2.0)
+    kaminari-core (1.2.0)
     listen (3.2.1)
       rb-fsevent (~> 0.10, >= 0.10.3)
       rb-inotify (~> 0.9, >= 0.9.10)
@@ -196,6 +208,7 @@ DEPENDENCIES
   faker!
   fast_jsonapi (~> 1.5)
   jwt (~> 2.2)
+  kaminari (~> 1.2)
   listen (~> 3.2)
   pry
   puma (~> 4.1)

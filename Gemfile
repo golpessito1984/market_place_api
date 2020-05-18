@@ -31,6 +31,7 @@ group :development, :test do
   gem 'factory_bot'
   gem 'factory_bot_rails'
   gem 'pry'
+  gem 'faker', :git => 'https://github.com/faker-ruby/faker.git', :branch => 'master'
 end
 
 group :development do
@@ -46,7 +47,6 @@ gem 'tzinfo-data', platforms: [:mingw, :mswin, :x64_mingw, :jruby]
 group :test do
   gem 'database_cleaner'
   gem 'rspec-rails'
-  gem 'faker', :git => 'https://github.com/faker-ruby/faker.git', :branch => 'master'
 end
 
 gem "bcrypt", "~> 3.1"
@@ -54,3 +54,5 @@ gem "bcrypt", "~> 3.1"
 gem "jwt", "~> 2.2"
 
 gem "fast_jsonapi", "~> 1.5"
+
+gem "kaminari", "~> 1.2"

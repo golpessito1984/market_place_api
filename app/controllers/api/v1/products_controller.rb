@@ -9,8 +9,16 @@ class Api::V1::ProductsController < ApplicationController
   end
 
   def index
-    products = Product.search(search_params)
-    render json: ProductSerializer.new(products).serializable_hash, status: :ok
+    products = Product.page(params[:page])
+                      .per(params[:per_page])
+                      .search(search_params)
+
+    options = { links: { first: api_v1_products_path(page: 1),
+                         last: api_v1_products_path(page: products.total_pages),
+                         prev: api_v1_products_path(page: products.prev_page),
+                         next: api_v1_products_path(page: products.next_page) } }
+
+    render json: ProductSerializer.new(products, options).serializable_hash, status: :ok
   end
 
   def create

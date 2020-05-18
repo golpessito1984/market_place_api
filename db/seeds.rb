@@ -5,3 +5,11 @@
 #
 #   movies = Movie.create([{ name: 'Star Wars' }, { name: 'Lord of the Rings' }])
 #   Character.create(name: 'Luke', movie: movies.first)
+#
+user = FactoryBot.create(:user, email: 'david.ruizdelarosa@gmail.com',
+                                password: '222333')
+
+(1..50).each do |number|
+  FactoryBot.create(:product,
+                    user_id: user.id)
+end

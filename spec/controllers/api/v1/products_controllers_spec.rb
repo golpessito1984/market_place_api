@@ -28,8 +28,13 @@ RSpec.describe Api::V1::ProductsController do
     it 'successfully return all products' do
       get :index
       expect(response.status).to eq(200)
-      products = JSON.parse(response.body)['data']
+      json_hash = JSON.parse(response.body, symbolize_names: true)
+      products = json_hash[:data]
       expect(products.count).to eq(3)
+      expect(json_hash.dig(:links, :first)).not_to be_nil
+      expect(json_hash.dig(:links, :last)).not_to be_nil
+      expect(json_hash.dig(:links, :prev)).not_to be_nil
+      expect(json_hash.dig(:links, :next)).not_to be_nil
     end
 
     it 'successfully return one product with search params correctly' do
