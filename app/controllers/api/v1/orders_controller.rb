@@ -5,7 +5,17 @@ class Api::V1::OrdersController < ApplicationController
   before_action :set_order, only: :show
 
   def index
-    render json: OrderSerializer.new(current_user.orders, { include: %i[user products] }).serializable_hash, status: :ok
+    orders = current_user.orders
+                 .page(current_page)
+                 .per(per_page)
+
+    options = { links: { first: api_v1_orders_path(page: 1),
+                         last: api_v1_orders_path(page: orders.total_pages),
+                         prev: api_v1_orders_path(page: orders.prev_page),
+                         next: api_v1_orders_path(page: orders.next_page) },
+                include: %i[user products] }
+
+    render json: OrderSerializer.new(orders, options).serializable_hash, status: :ok
   end
 
   def show

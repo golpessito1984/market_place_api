@@ -17,13 +17,20 @@ RSpec.describe Api::V1::OrdersController do
       @placement2 = FactoryBot.create(:placement, product_id: @product2.id,
                                                   order_id: @order.id)
     end
+
     it 'successfully when user is logged' do
       bearer_token = { Authorization:
                             JwtWebToken.encode(user_id: @buyer.id) }
 
       request.headers.merge!(bearer_token)
       get :index
+
       expect(response.status).to eq(200)
+      json_hash = JSON.parse(response.body, symbolize_names: true)
+      expect(json_hash.dig(:links, :first)).not_to be_nil
+      expect(json_hash.dig(:links, :last)).not_to be_nil
+      expect(json_hash.dig(:links, :prev)).not_to be_nil
+      expect(json_hash.dig(:links, :next)).not_to be_nil
     end
 
     it 'not successfully when user is not logged' do
