@@ -1,6 +1,7 @@
 require 'rails_helper'
 
 RSpec.describe Api::V1::OrdersController do
+  include Pagination
 
   before(:each) do
     @seller = FactoryBot.create(:user)
@@ -27,10 +28,7 @@ RSpec.describe Api::V1::OrdersController do
 
       expect(response.status).to eq(200)
       json_hash = JSON.parse(response.body, symbolize_names: true)
-      expect(json_hash.dig(:links, :first)).not_to be_nil
-      expect(json_hash.dig(:links, :last)).not_to be_nil
-      expect(json_hash.dig(:links, :prev)).not_to be_nil
-      expect(json_hash.dig(:links, :next)).not_to be_nil
+      assert_json_response_is_paginated(json_hash)
     end
 
     it 'not successfully when user is not logged' do

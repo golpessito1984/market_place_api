@@ -1,7 +1,10 @@
 # frozen_string_literal: true
 require 'rails_helper'
+Dir[Rails.root.join('spec/support/**/*.rb')].each { |f| require f }
+
 
 RSpec.describe Api::V1::ProductsController do
+  include Pagination
 
   before(:each) do
     @user = FactoryBot.create(:user)
@@ -31,10 +34,7 @@ RSpec.describe Api::V1::ProductsController do
       json_hash = JSON.parse(response.body, symbolize_names: true)
       products = json_hash[:data]
       expect(products.count).to eq(3)
-      expect(json_hash.dig(:links, :first)).not_to be_nil
-      expect(json_hash.dig(:links, :last)).not_to be_nil
-      expect(json_hash.dig(:links, :prev)).not_to be_nil
-      expect(json_hash.dig(:links, :next)).not_to be_nil
+      assert_json_response_is_paginated(json_hash)
     end
 
     it 'successfully return one product with search params correctly' do
